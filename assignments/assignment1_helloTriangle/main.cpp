@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -44,8 +43,8 @@ int main() {
 	if (!success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		//printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %d", infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
+		//std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -56,7 +55,7 @@ int main() {
 	if (!success)
 	{
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
 	}
 
 	shaderProgram = glCreateProgram(); //creates program and returns id to program obj
@@ -69,8 +68,11 @@ int main() {
 	if (!success)
 	{
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::PROGRAM:::LINKING_FAILED\n" << infoLog << std::endl;
+		printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
 	}
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);//delete shaders after linking
 
 	//-----------------------------------------------------------------------------------------------
 
@@ -82,29 +84,23 @@ int main() {
 	};
 
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
-	unsigned int VAO; 
+	unsigned int VAO; //vertex array object: has a pointer to a VBO, EBO, and attributes (mesh)
 
-	glGenBuffers(1, &VBO); //generates unique id for buffer
 	glGenVertexArrays(1, &VAO);
-
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAO); //sets mesh that is being worked on, do this before binding VBO
 	
 	//copy verts into buffer
+	glGenBuffers(1, &VBO); //generates unique id for buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //sets buffer that is currently being worked on
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW); //copies previously assigned data into buffer memory
 
 	// set attib pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(0); //actually enable attributes
 	
 
 	glUseProgram(shaderProgram); //sets program to use
 	glBindVertexArray(VAO);
-
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);//delete shaders after linking
-
 
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -112,9 +108,11 @@ int main() {
 		//Clear framebuffer
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		//Drawing happens here!
+
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
+
+		//Drawing happens here!
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwSwapBuffers(window);
 	}
