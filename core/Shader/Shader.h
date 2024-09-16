@@ -16,6 +16,7 @@
 		Shader(const char* vertexPath, const char* fragmentPath);
 
 		void use();
+		unsigned int getProgram();
 
 		void setBool(const std::string &name, bool value) const;
 		void setFloat(const std::string &name, float value) const;

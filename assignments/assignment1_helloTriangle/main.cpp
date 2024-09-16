@@ -72,10 +72,9 @@ int main() {
 		ourShader.Shader::use();
 		
 		//update uniform
-		/*float time = glfwGetTime();
-		float greenValue = (sin(time) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shaderProgram, "uOurColor");
-		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 0.0f);*/
+		float time = glfwGetTime();
+		int timeLoc = glGetUniformLocation(ourShader.mId, "uTime");
+		glUniform1f(timeLoc, time);
 		
 		//draw
 		glBindVertexArray(VAO);

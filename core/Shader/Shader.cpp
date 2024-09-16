@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-Shader::Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
 	//get shader code from file path
 	std::string vertexCode;
@@ -80,22 +80,27 @@ Shader::Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	glDeleteShader(fragment);
 }
 
-void Shader::Shader::use()
+void Shader::use()
 {
 	glUseProgram(mId);
 }
 
-void Shader::Shader::setBool(const std::string& name, bool value) const
+unsigned int Shader::getProgram()
+{
+	return mId;
+}
+
+void Shader::setBool(const std::string& name, bool value) const
 {
 	glUniform1i(glGetUniformLocation(mId, name.c_str()), (int)value);
 }
 
-void Shader::Shader::setFloat(const std::string& name, float value) const
+void Shader::setFloat(const std::string& name, float value) const
 {
 	glUniform1f(glGetUniformLocation(mId, name.c_str()), value);
 }
 
-void Shader::Shader::setInt(const std::string& name, int value) const
+void Shader::setInt(const std::string& name, int value) const
 {
 	glUniform1i(glGetUniformLocation(mId, name.c_str()), value);
 }
