@@ -7,8 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "assets/Shader/vShader.txt"
-#include "assets/Shader/fShader.txt"
+#include "Shader/Shader.h"
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720; 
@@ -30,55 +29,16 @@ int main() {
 		return 1;
 	}
 
-	//Initialization goes here!
-	unsigned int vertexShader, fragmentShader; // id for shaders
-	unsigned int shaderProgram; //an object that is the final linked version of multiple shaders combined
-	int success;
-	char infoLog[512];
-
-	vertexShader = glCreateShader(GL_VERTEX_SHADER); //type of shader wanted
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); //attach source code to shader object
-	glCompileShader(vertexShader); //complies shader
-
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		//printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %d", infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	shaderProgram = glCreateProgram(); //creates program and returns id to program obj
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram); //links shaders to program
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::PROGRAM:::LINKING_FAILED\n" << infoLog << std::endl;
-	}
+	Shader ourShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
 
 	//-----------------------------------------------------------------------------------------------
 
 	float verts[] =
 	{
-		-0.5f, -0.5f, 0.0,
-		0.5f, -0.5f, 0.0,
-		0.0f, 0.5f, 0.0
+	//	X		Y		Z		R		G		B		A
+		-0.5f,	-0.5f,	0.0,	0.729f,	0.929f,	0.843f,			//bottom left
+		 0.5f,	-0.5f,	0.0,	0.89f,	0.71f,	0.71f,			//bottom right
+		 0.0f,	 0.5f,	0.0,	0.745f,	0.749f,	0.792f			//top
 	};
 
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
@@ -93,29 +53,35 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //sets buffer that is currently being worked on
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW); //copies previously assigned data into buffer memory
 
-	// set attib pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//set attib pointers
+	//pos
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	
 
-	glUseProgram(shaderProgram); //sets program to use
-	glBindVertexArray(VAO);
-
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);//delete shaders after linking
-
+	//color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		//Clear framebuffer
-		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		//Drawing happens here!
-		glUseProgram(shaderProgram);
+
+		//set program
+		ourShader.Shader::use();
+		
+		//update uniform
+		/*float time = glfwGetTime();
+		float greenValue = (sin(time) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "uOurColor");
+		glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 0.0f);*/
+		
+		//draw
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
