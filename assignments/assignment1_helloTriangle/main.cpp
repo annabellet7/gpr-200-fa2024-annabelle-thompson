@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
@@ -29,6 +28,7 @@ int main() {
 		return 1;
 	}
 
+	//Initialization goes here!
 	Shader ourShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
 
 	//-----------------------------------------------------------------------------------------------
@@ -42,14 +42,13 @@ int main() {
 	};
 
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
-	unsigned int VAO; 
+	unsigned int VAO; //vertex array object: has a pointer to a VBO, EBO, and attributes (mesh)
 
-	glGenBuffers(1, &VBO); //generates unique id for buffer
 	glGenVertexArrays(1, &VAO);
-
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAO); //sets mesh that is being worked on, do this before binding VBO
 	
 	//copy verts into buffer
+	glGenBuffers(1, &VBO); //generates unique id for buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO); //sets buffer that is currently being worked on
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW); //copies previously assigned data into buffer memory
 
@@ -80,6 +79,8 @@ int main() {
 		
 		//draw
 		glBindVertexArray(VAO);
+
+		//Drawing happens here!
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
