@@ -35,10 +35,10 @@ int main() {
 
 	float verts[] =
 	{
-	//	X		Y		Z		R		G		B		A
-		-0.5f,	-0.5f,	0.0,	0.729f,	0.929f,	0.843f,			//bottom left
-		 0.5f,	-0.5f,	0.0,	0.89f,	0.71f,	0.71f,			//bottom right
-		 0.0f,	 0.5f,	0.0,	0.745f,	0.749f,	0.792f			//top
+	//	X		Y		Z		R		G		B		A		R		G		B		A
+		-0.5f,	-0.5f,	0.0,	1.0f,	0.0f,	0.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	//bottom left
+		 0.5f,	-0.5f,	0.0,	0.0f,	1.0f,	0.0f,	1.0f,	0.0f,	1.0f,	1.0f,	1.0f,	//bottom right
+		 0.0f,	 0.5f,	0.0,	0.0f,	0.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	1.0f,	//top
 	};
 
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
@@ -54,12 +54,16 @@ int main() {
 
 	//set attib pointers
 	//pos
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	//primary color
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	//compliment color
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(7 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
