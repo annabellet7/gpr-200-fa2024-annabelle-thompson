@@ -85,8 +85,8 @@ int main() {
 	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 	
-	Texture2D webTexture("assets/Textures/web.jpg", GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGB);
-	Texture2D boxTexture("assets/Textures/container.jpg", GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGB);
+	Texture2D webTexture("assets/Textures/web.jpg", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_RGB);
+	Texture2D boxTexture("assets/Textures/container.jpg", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_RGB);
 
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {

@@ -12,7 +12,10 @@ out vec2 TexCoord;
 void main()
 {
     vec4 pos = vec4(aPos, 1.0);
+    vec2 texCoord = aTexCoord;
+    texCoord.x *= 3;
+    texCoord.y *= 3;
     gl_Position = pos;
     ourColor = aColor;
-    TexCoord = aTexCoord;
+    TexCoord = texCoord;
 }
