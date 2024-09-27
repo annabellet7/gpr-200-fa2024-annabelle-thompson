@@ -31,17 +31,19 @@ int main() {
 	}
 
 	//Initialization goes here!
-	Shader ourShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Shader characterShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
 
 	//-----------------------------------------------------------------------------------------------
 
 	float verts[] =
 	{
 	//	X		Y		Z		R		G		B		A		U		V
-		0.5f,	0.5f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,	1.0f,	1.0f,   // top right
-		0.5f,	-0.5f,	0.0f,	0.0f,	1.0f,	0.0f,	1.0f,	1.0f,	0.0f,   // bottom right
-		-0.5f,	-0.5f,	0.0f,	0.0f,	0.0f,	1.0f,	1.0f,	0.0f,	0.0f,   // bottom left
-		-0.5f,	0.5f,	0.0f,	1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	1.0f    // top left 
+		1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	0.0f,	1.0f,	1.0f,	1.0f,   // top right
+		1.0f,	-1.0f,	0.0f,	0.0f,	1.0f,	0.0f,	1.0f,	1.0f,	0.0f,   // bottom right
+		-1.0f,	-1.0f,	0.0f,	0.0f,	0.0f,	1.0f,	1.0f,	0.0f,	0.0f,   // bottom left
+		-1.0f,	1.0f,	0.0f,	1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	1.0f    // top left 
 	};
 
 	unsigned int indices[] = 
@@ -50,17 +52,9 @@ int main() {
 		1, 2, 3    // second triangle
 	};
 
-	float texCoords[] = 
-	{
-		0.0f, 0.0f,  // lower-left corner  
-		1.0f, 0.0f,  // lower-right corner
-		0.5f, 1.0f   // top-center corner
-	};
-
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
 	unsigned int VAO; //vertex array object: has a pointer to a VBO, EBO, and attributes (mesh)
 	unsigned int EBO; //element buffer object: stores indinces
-	//unsigned int texture1, texture2;
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO); //sets mesh that is being worked on, do this before binding VBO
@@ -86,12 +80,12 @@ int main() {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Texture2D texture1("assets/Textures/container.jpg", GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_REPEAT, GL_REPEAT, GL_RGB);
-	Texture2D texture2("assets/Textures/awesomeface.png", GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_REPEAT, GL_REPEAT, GL_RGBA);
+	Texture2D texture1("assets/Textures/pixil-frame-0.png", GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGBA);
+	//Texture2D texture2("assets/Textures/spider-web-seamless-pattern-2179584.jpg", GL_TEXTURE_MIN_FILTER, GL_NEAREST, GL_LINEAR, GL_REPEAT, GL_RGBA);
 
-	ourShader.Shader::use();
-	glUniform1i(glGetUniformLocation(ourShader.getProgram(), "texture1"), 0);
-	glUniform1i(glGetUniformLocation(ourShader.getProgram(), "texture2"), 1);
+	characterShader.Shader::use();
+	glUniform1i(glGetUniformLocation(characterShader.getProgram(), "texture1"), 0);
+	//glUniform1i(glGetUniformLocation(characterShader.getProgram(), "texture2"), 1);
 
 
 	//Render loop
@@ -104,15 +98,15 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		//update uniform
-		/*float time = glfwGetTime();
-		int timeLoc = glGetUniformLocation(ourShader.mId, "uTime");
-		glUniform1f(timeLoc, time);*/
+		float time = glfwGetTime();
+		int timeLoc = glGetUniformLocation(characterShader.mId, "uTime");
+		glUniform1f(timeLoc, time);
 		
 		//draw
 		texture1.Texture2D::bind();
-		texture2.Texture2D::bind(1);
+		//texture2.Texture2D::bind(1);
 
-		ourShader.Shader::use();
+		characterShader.Shader::use();
 		glBindVertexArray(VAO);
 
 		//Drawing happens here!
