@@ -21,7 +21,7 @@ Texture2D::Texture2D(const char* filePath, int filterModeMin, int FliterModMag, 
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << filePath << " Failed to load texture" << std::endl;
     }
 
     stbi_image_free(data);

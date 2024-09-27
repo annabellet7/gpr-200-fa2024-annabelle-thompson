@@ -34,6 +34,7 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Shader characterShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
+	Shader bgShader("assets/shaderAssets/bgvShader.vert", "assets/shaderAssets/bgfShader.frag");
 
 	//-----------------------------------------------------------------------------------------------
 
@@ -80,13 +81,12 @@ int main() {
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	Texture2D texture1("assets/Textures/pixil-frame-0.png", GL_NEAREST, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGBA);
-	//Texture2D texture2("assets/Textures/spider-web-seamless-pattern-2179584.jpg", GL_TEXTURE_MIN_FILTER, GL_NEAREST, GL_LINEAR, GL_REPEAT, GL_RGBA);
-
-	characterShader.Shader::use();
-	glUniform1i(glGetUniformLocation(characterShader.getProgram(), "texture1"), 0);
-	//glUniform1i(glGetUniformLocation(characterShader.getProgram(), "texture2"), 1);
-
+	Texture2D spiderTexture("assets/Textures/pixil-frame-0.png", GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_RGBA);
+	float borderColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	
+	Texture2D webTexture("assets/Textures/web.jpg", GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGB);
+	Texture2D boxTexture("assets/Textures/container.jpg", GL_LINEAR, GL_NEAREST, GL_REPEAT, GL_REPEAT, GL_RGB);
 
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -96,17 +96,41 @@ int main() {
 		//Clear framebuffer
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		//bg
+		//use shader
+		bgShader.Shader::use();
 		
 		//update uniform
-		float time = glfwGetTime();
-		int timeLoc = glGetUniformLocation(characterShader.mId, "uTime");
-		glUniform1f(timeLoc, time);
-		
-		//draw
-		texture1.Texture2D::bind();
-		//texture2.Texture2D::bind(1);
+		glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture2"), 1);
+		glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture3"), 2);
 
+		float time = glfwGetTime();
+		int timeLoc = glGetUniformLocation(bgShader.mId, "uTime");
+		glUniform1f(timeLoc, time);
+
+		//Drawing happens here!
+		webTexture.Texture2D::bind(1);
+		boxTexture.Texture2D::bind(2);
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		//----------------------------------------------------------------
+
+		//character
+		//use shader
 		characterShader.Shader::use();
+
+		//update uniform
+		glUniform1i(glGetUniformLocation(characterShader.getProgram(), "texture1"), 0);
+
+		time = glfwGetTime();
+		glUniform1f(glGetUniformLocation(characterShader.mId, "uTime"), time);
+
+		//draw
+		spiderTexture.Texture2D::bind();
+		
+		//characterShader.Shader::use();
 		glBindVertexArray(VAO);
 
 		//Drawing happens here!

@@ -4,8 +4,8 @@ out vec4 FragColor;
 in vec4 ourColor;
 in vec2 TexCoord;
 
-uniform sampler2D texture1;
 uniform float uTime;
+uniform sampler2D texture1;
 
 void main()
 {
