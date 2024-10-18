@@ -11,9 +11,21 @@
 
 #include "Shader/Shader.h"
 #include "Texture/Texture.h"
+#include "Camera/Camera.h"
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
+bool firstMouse = true;
+float lastX = 400, lastY = 300;
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720; 
+
+void processInput(GLFWwindow* window);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main() {
 	printf("Initializing...\n");
@@ -35,6 +47,7 @@ int main() {
 	//Initialization goes here!
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Shader characterShader("assets/shaderAssets/vShader.vert", "assets/shaderAssets/fShader.frag");
 	Shader bgShader("assets/shaderAssets/bgvShader.vert", "assets/shaderAssets/bgfShader.frag");
@@ -134,10 +147,22 @@ int main() {
 	Texture2D webTexture("assets/Textures/web.jpg", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_RGB);
 	Texture2D boxTexture("assets/Textures/container.jpg", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT, GL_RGB);
 
+	//set active shader and set textures to units
+	bgShader.Shader::use();
+	glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture2"), 1);
+	glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture3"), 2);
+
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
+		//update time
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		
 		//input
-		glfwPollEvents();
+		processInput(window);
+		glfwSetCursorPosCallback(window, mouseCallback);
+		glfwSetScrollCallback(window, scrollCallback);
 
 		//Clear framebuffer
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
@@ -156,27 +181,12 @@ int main() {
 		int timeLoc = glGetUniformLocation(bgShader.mId, "uTime");
 		glUniform1f(timeLoc, time);
 
-		//coordinate system
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 projection;
+		//camera view
+		glm::mat4 projection = glm::perspective(glm::radians(cam.mZoom), 800.0f / 600.0f, 0.1f, 100.0f);
+		bgShader.setMat4("projection", projection);
 
-		model = glm::rotate(model, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-		int modelLoc = glGetUniformLocation(bgShader.mId, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-		int viewLoc = glGetUniformLocation(bgShader.mId, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-		int projectionLoc = glGetUniformLocation(bgShader.mId, "projection");
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-		//textures
-		glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture2"), 1);
-		glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture3"), 2);
+		glm::mat4 view = cam.getViewMatrix();
+		bgShader.setMat4("view", view);
 		
 		//draw
 		glBindVertexArray(VAO);
@@ -191,7 +201,7 @@ int main() {
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		
-
+		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
 
@@ -201,4 +211,52 @@ int main() {
 	glfwTerminate();
 
 	printf("Shutting down...");
+}
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+		std::cout << "e" << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		cam.keyboardInput(FORWARD, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		cam.keyboardInput(BACKWARD, deltaTime); 
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		cam.keyboardInput(LEFT, deltaTime); 
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		cam.keyboardInput(RIGHT, deltaTime); 
+	}
+}
+
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+	
+	float xOffset = xpos - lastX;
+	float yOffset = ypos - lastY;
+	lastX = xpos;
+	lastY = ypos;
+
+	cam.mouseMoveInput(xOffset, yOffset);
+}
+
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+	cam.mouseWheelInput(yOffset);
 }
