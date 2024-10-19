@@ -104,20 +104,37 @@ int main() {
 		1, 2, 3    // second triangle
 	};
 
-
-	glm::vec3 cubePositions[] = 
+	glm::vec3 posRand[20];
+	for (int i = 0; i < 20; i++)
 	{
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
+		posRand[i].x = ew::RandomRange(-5.0, 5.0f);
+		posRand[i].y = ew::RandomRange(-5.0f, 5.0f);
+		posRand[i].z = ew::RandomRange(-10.0f, -5.0f);
+	}
+
+	float rotationAngleRand[20];
+	for (int i = 0; i < 20; i++)
+	{
+		rotationAngleRand[i] = ew::RandomRange(-179, 179);
+	}
+
+	glm::vec3 rotationAxisRand[20];
+	for (int i = 0; i < 20; i++)
+	{
+		rotationAxisRand[i].x = ew::RandomRange(-10.0, 10.0f);
+		rotationAxisRand[i].y = ew::RandomRange(-10.0f, 10.0f);
+		rotationAxisRand[i].z = ew::RandomRange(-10.0f, 0.0f);
+	}
+
+	glm::vec3 scaleRand[20];
+	for (int i = 0; i < 20; i++)
+	{
+		scaleRand[i].x = ew::RandomRange(1.0, 20.0f);
+		scaleRand[i].y = scaleRand[i].x;
+		scaleRand[i].z = scaleRand[i].x;
+	}
+
+
 
 	unsigned int VBO; //vertex buffer object: can stores vertices on GPU memory, can send large amounts of data at a time
 	unsigned int VAO; //vertex array object: has a pointer to a VBO, EBO, and attributes (mesh)
@@ -182,7 +199,7 @@ int main() {
 		glUniform1f(timeLoc, time);
 
 		//camera view
-		glm::mat4 projection = glm::perspective(glm::radians(cam.mZoom), 800.0f / 600.0f, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(cam.mZoom), 800.0f / 600.0f, 0.1f, 1000.0f);
 		bgShader.setMat4("projection", projection);
 
 		glm::mat4 view = cam.getViewMatrix();
@@ -190,12 +207,13 @@ int main() {
 		
 		//draw
 		glBindVertexArray(VAO);
-		for (unsigned int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 20; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
+			model = glm::scale(model, scaleRand[i]);
+			model = glm::translate(model, posRand[i]);
 			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			model = glm::rotate(model, glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
 			bgShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -218,7 +236,6 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
-		std::cout << "e" << std::endl;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

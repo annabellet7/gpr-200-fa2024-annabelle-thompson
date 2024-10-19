@@ -83,9 +83,9 @@ void Camera::mouseWheelInput(float yOffset)
 	{
 		mZoom = 1.0f;
 	}
-	if (mZoom > 90.0f)
+	if (mZoom > 120.0f)
 	{
-		mZoom = 90.0f;
+		mZoom = 120.0f;
 	}
 }
 
