@@ -254,6 +254,14 @@ void processInput(GLFWwindow* window)
 	{
 		cam.keyboardInput(RIGHT, deltaTime); 
 	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		cam.keyboardInput(UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		cam.keyboardInput(DOWN, deltaTime);
+	}
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)

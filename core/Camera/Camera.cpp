@@ -50,6 +50,12 @@ void Camera::keyboardInput(CameraMovement direction, float deltaTime)
 	case RIGHT:
 		mPosition += mRight * velocity;
 		break;
+	case UP:
+		mPosition += mUp * velocity;
+		break;
+	case DOWN:
+		mPosition -= mUp * velocity;
+		break;
 	}
 }
 

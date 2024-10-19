@@ -16,12 +16,14 @@ enum CameraMovement
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 2.5f;
+const float SPEED = 8.0f;
 const float SENS = 0.1f;
 const float ZOOM = 60.0f;
 
