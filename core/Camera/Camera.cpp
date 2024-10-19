@@ -33,9 +33,10 @@ glm::mat4 Camera::getViewMatrix()
 	return lookAt(mPosition, mPosition + mFront, mUp);
 }
 
-void Camera::keyboardInput(CameraMovement direction, float deltaTime)
+void Camera::keyboardInput(CameraMovement direction, float deltaTime, bool sprit)
 {
 	float velocity = mMovementSpeed * deltaTime;
+
 	switch (direction)
 	{
 	case FORWARD:
@@ -55,6 +56,12 @@ void Camera::keyboardInput(CameraMovement direction, float deltaTime)
 		break;
 	case DOWN:
 		mPosition -= mUp * velocity;
+		break;
+	case SPRINT:
+		mMovementSpeed = SPEED * 2;
+		break;
+	case WALK:
+		mMovementSpeed = SPEED;
 		break;
 	}
 }

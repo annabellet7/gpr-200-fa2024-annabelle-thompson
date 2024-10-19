@@ -18,12 +18,14 @@ enum CameraMovement
 	LEFT,
 	RIGHT,
 	UP,
-	DOWN
+	DOWN,
+	SPRINT,
+	WALK
 };
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
-const float SPEED = 8.0f;
+const float SPEED = 15.0f;
 const float SENS = 0.1f;
 const float ZOOM = 60.0f;
 
@@ -39,7 +41,7 @@ public:
 	Camera(float xPos, float yPos, float zPos, float upX, float upY, float upZ, float yaw, float pitch);
 
 	glm::mat4 getViewMatrix();
-	void keyboardInput(CameraMovement direction, float deltaTime);
+	void keyboardInput(CameraMovement direction, float deltaTime, bool sprint = false);
 	void mouseMoveInput(float xOffset, float yOffset, GLboolean constrainPitch = true);
 	void mouseWheelInput(float yOffset);
 

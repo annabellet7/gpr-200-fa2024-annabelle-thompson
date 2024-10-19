@@ -169,13 +169,15 @@ int main() {
 	glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture2"), 1);
 	glUniform1i(glGetUniformLocation(bgShader.getProgram(), "texture3"), 2);
 
+	float rotationTime = 0;
 	//Render loop
 	while (!glfwWindowShouldClose(window)) {
 		//update time
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		
+		rotationTime += deltaTime;
+
 		//input
 		processInput(window);
 		glfwSetCursorPosCallback(window, mouseCallback);
@@ -213,7 +215,7 @@ int main() {
 			model = glm::scale(model, scaleRand[i]);
 			model = glm::translate(model, posRand[i]);
 			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
+			model = glm::rotate(model, rotationTime * glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
 			bgShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -238,6 +240,17 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	//speed
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
+		cam.keyboardInput(SPRINT, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	{
+		cam.keyboardInput(WALK, deltaTime);
+	}
+	
+	//direction
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		cam.keyboardInput(FORWARD, deltaTime);
