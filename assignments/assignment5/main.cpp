@@ -23,7 +23,7 @@ float lastX = 400, lastY = 300;
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720; 
 
-glm::vec3 lightPos(0.0, 0.0, 0.0);
+glm::vec3 lightPos(0.0f, 0.0f, -9.0f);
 
 void processInput(GLFWwindow* window);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
@@ -209,6 +209,7 @@ int main() {
 		basicLightingShader.Shader::use();
 		basicLightingShader.setVec3("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		basicLightingShader.setVec3("uLightPos", lightPos);
+		basicLightingShader.setVec3("uViewPos", cam.getPos());
 
 		//update uniform
 		//time

@@ -40,6 +40,7 @@ public:
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 	Camera(float xPos, float yPos, float zPos, float upX, float upY, float upZ, float yaw, float pitch);
 
+	glm::vec3 getPos();
 	glm::mat4 getViewMatrix();
 	void keyboardInput(CameraMovement direction, float deltaTime, bool sprint = false);
 	void mouseMoveInput(float xOffset, float yOffset, GLboolean constrainPitch = true);

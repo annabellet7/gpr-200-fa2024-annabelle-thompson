@@ -12,6 +12,7 @@ uniform float uTime;
 
 uniform vec3 uLightColor;
 uniform vec3 uLightPos;
+uniform vec3 uViewPos;
 
 void main()
 {
@@ -20,10 +21,16 @@ void main()
 
 	vec4 cubeTexture = mix(texture(texture2, TexCoord), texture(texture3, TexCoord), 0.4);
 	vec3 norm = normalize(Normal);
+
 	vec3 lightDir = normalize(uLightPos - FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * uLightColor;
 
-	vec3 result = (ambient + diffuse) * vec3(cubeTexture.x, cubeTexture.y, cubeTexture.z);
+	vec3 viewDir = normalize(uViewPos - FragPos);
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
+	vec3  specular = uLightColor * spec;
+
+	vec3 result = (ambient + diffuse + specular) * vec3(cubeTexture.x, cubeTexture.y, cubeTexture.z);
 	FragColor = vec4(result, 1.0);
 }

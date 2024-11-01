@@ -28,6 +28,11 @@ Camera::Camera(float xPos, float yPos, float zPos, float xUp, float yUp, float z
 	mZoom = ZOOM;
 }
 
+glm::vec3 Camera::getPos()
+{
+	return mPosition;
+}
+
 glm::mat4 Camera::getViewMatrix()
 {
 	return lookAt(mPosition, mPosition + mFront, mUp);
