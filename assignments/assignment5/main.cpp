@@ -207,8 +207,8 @@ int main() {
 
 		//use shader
 		basicLightingShader.Shader::use();
-		basicLightingShader.setVec3("uObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 		basicLightingShader.setVec3("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		basicLightingShader.setVec3("uLightPos", lightPos);
 
 		//update uniform
 		//time
