@@ -27,8 +27,12 @@ float lastX = 400, lastY = 300;
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720; 
 
-glm::vec3 lightPos(0.0f, 0.0f, -9.0f);
+glm::vec3 lightPos(0.0f, 0.0f, -0.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+float ambientK = 0.15f;
+float diffuseK = 1.0f;
+float specularK = 1.0f;
+int shininess = 32;
 
 void processInput(GLFWwindow* window);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
@@ -121,9 +125,9 @@ int main() {
 	glm::vec3 posRand[20];
 	for (int i = 0; i < 20; i++)
 	{
-		posRand[i].x = ew::RandomRange(-5.0, 5.0f);
-		posRand[i].y = ew::RandomRange(-5.0f, 5.0f);
-		posRand[i].z = ew::RandomRange(-10.0f, -5.0f);
+		posRand[i].x = ew::RandomRange(-5.0, 10.0f);
+		posRand[i].y = ew::RandomRange(-5.0f, 10.0f);
+		posRand[i].z = ew::RandomRange(-10.0f, 0.0f);
 	}
 
 	float rotationAngleRand[20];
@@ -143,7 +147,7 @@ int main() {
 	glm::vec3 scaleRand[20];
 	for (int i = 0; i < 20; i++)
 	{
-		scaleRand[i].x = ew::RandomRange(1.0, 20.0f);
+		scaleRand[i].x = ew::RandomRange(0.1, 1.0f);
 		scaleRand[i].y = scaleRand[i].x;
 		scaleRand[i].z = scaleRand[i].x;
 	}
@@ -222,6 +226,10 @@ int main() {
 		basicLightingShader.setVec3("uLightPos", lightPos);
 		basicLightingShader.setVec3("uViewPos", cam.getPos());
 		basicLightingShader.setVec3("uLightColor", lightColor);
+		basicLightingShader.setFloat("uAmbientK", ambientK);
+		basicLightingShader.setFloat("uDiffuseK", diffuseK);
+		basicLightingShader.setFloat("uSpecularK", specularK);
+		basicLightingShader.setInt("uShininess", shininess);
 
 		//update uniform
 		//time
@@ -241,10 +249,10 @@ int main() {
 		for (unsigned int i = 0; i < 20; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::scale(model, scaleRand[i]);
 			model = glm::translate(model, posRand[i]);
 			float angle = 20.0f * i;
-			//model = glm::rotate(model, rotationTime * glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
+			model = glm::rotate(model, rotationTime * glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
+			model = glm::scale(model, scaleRand[i]);
 			basicLightingShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -252,11 +260,14 @@ int main() {
 
 		//light cube
 		lampShader.Shader::use();
+		lampShader.setVec3("uLightColor", lightColor);
+
 		lampShader.setMat4("projection", projection);
 		lampShader.setMat4("view", view);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
 		lampShader.setMat4("model", model);
 
 		glBindVertexArray(lampVAO);
@@ -271,6 +282,10 @@ int main() {
 		ImGui::Begin("Settings");
 		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
 		ImGui::ColorEdit3("Light Color", &lightColor.r);
+		ImGui::SliderFloat("Ambient K", &ambientK, 0.0f, 1.0f);
+		ImGui::SliderFloat("Diffuse K", &diffuseK, 0.0f, 1.0f);
+		ImGui::SliderFloat("Specular K", &specularK, 0.0f, 1.0f);
+		ImGui::SliderInt("Shininess", &shininess, 2, 1024);
 		ImGui::End();
 
 		//render imgui
