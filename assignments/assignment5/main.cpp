@@ -9,6 +9,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include "Shader/Shader.h"
 #include "Texture/Texture.h"
 #include "Camera/Camera.h"
@@ -24,6 +28,7 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720; 
 
 glm::vec3 lightPos(0.0f, 0.0f, -9.0f);
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
 void processInput(GLFWwindow* window);
 void mouseCallback(GLFWwindow* window, double xpos, double ypos);
@@ -51,6 +56,12 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
+
 	Shader basicLightingShader("assets/shaderAssets/basicLightingVShader.vert", "assets/shaderAssets/basicLightingFShader.frag");
 	Shader lampShader("assets/shaderAssets/lampVShader.vert", "assets/shaderAssets/lampFShader.frag");
 
@@ -199,7 +210,7 @@ int main() {
 
 		//Clear framebuffer
 		glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 		//bind textures
 		webTexture.Texture2D::bind(1);
@@ -210,6 +221,7 @@ int main() {
 		basicLightingShader.setVec3("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		basicLightingShader.setVec3("uLightPos", lightPos);
 		basicLightingShader.setVec3("uViewPos", cam.getPos());
+		basicLightingShader.setVec3("uLightColor", lightColor);
 
 		//update uniform
 		//time
@@ -232,23 +244,38 @@ int main() {
 			model = glm::scale(model, scaleRand[i]);
 			model = glm::translate(model, posRand[i]);
 			float angle = 20.0f * i;
-			model = glm::rotate(model, rotationTime * glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
+			//model = glm::rotate(model, rotationTime * glm::radians(rotationAngleRand[i]), rotationAxisRand[i]);
 			basicLightingShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
+		//light cube
 		lampShader.Shader::use();
 		lampShader.setMat4("projection", projection);
 		lampShader.setMat4("view", view);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, lightPos);
-		//model = glm::scale(model, glm::vec3(0.2f));
 		lampShader.setMat4("model", model);
 
 		glBindVertexArray(lampVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		//draw imgui
+		ImGui_ImplGlfw_NewFrame();
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui::NewFrame();
+
+		//imgui window
+		ImGui::Begin("Settings");
+		ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
+		ImGui::ColorEdit3("Light Color", &lightColor.r);
+		ImGui::End();
+
+		//render imgui
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -314,13 +341,23 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 		lastY = ypos;
 		firstMouse = false;
 	}
-	
-	float xOffset = xpos - lastX;
-	float yOffset = ypos - lastY;
-	lastX = xpos;
-	lastY = ypos;
 
-	cam.mouseMoveInput(xOffset, yOffset);
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
+	{
+		float xOffset = xpos - lastX;
+		float yOffset = ypos - lastY;
+		lastX = xpos;
+		lastY = ypos;
+
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		cam.mouseMoveInput(xOffset, yOffset);
+	}
+	else
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		firstMouse = true;
+	}
+	
 }
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)

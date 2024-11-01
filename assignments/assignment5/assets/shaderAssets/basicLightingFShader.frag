@@ -13,11 +13,12 @@ uniform float uTime;
 uniform vec3 uLightColor;
 uniform vec3 uLightPos;
 uniform vec3 uViewPos;
+uniform vec3 uAmbientStrength;
 
 void main()
-{
-	float ambientStrength = 0.15;
-	vec3 ambient = ambientStrength * uLightColor;
+{ 
+	float FambientStrength = 0.2f;
+	vec3 ambient = FambientStrength * uLightColor;
 
 	vec4 cubeTexture = mix(texture(texture2, TexCoord), texture(texture3, TexCoord), 0.4);
 	vec3 norm = normalize(Normal);
