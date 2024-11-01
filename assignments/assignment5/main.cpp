@@ -58,7 +58,7 @@ int main() {
 	//Initialization goes here!
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	processInput(window);
@@ -213,8 +213,8 @@ int main() {
 
 		//input
 		processInput(window);
-		glfwSetCursorPosCallback(window, mouseCallback);
-		glfwSetScrollCallback(window, scrollCallback);
+	//	glfwSetCursorPosCallback(window, mouseCallback);
+	//	glfwSetScrollCallback(window, scrollCallback);
 
 		//Clear framebuffer
 		glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
